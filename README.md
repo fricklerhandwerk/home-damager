@@ -28,40 +28,40 @@ It will match the Home Manager release to the version of Nixpkgs in use for the 
 
 # Example
 
-Start by adding remote sources:
+
+Check [`example.nix`](./example.nix) for the structure of the entry point to your set of Home Manager configurations.
+
+To use it, get a copy and add remote sources:
 
 ```console
-nix-shell -p npins --run $SHELL
+nix-shell -p npins wget --run $SHELL
+wget https://github.com/fricklerhanderk/home-damager/tree/main/example.nix
 npins init --bare
 npins add github nixos nixpkgs --branch nixos-23.11
 npins add github fricklerhandwerk home-damager
 ```
 
-Then the entry point to your set of Home Manager configurations can have this structure:
+# Development
 
-```nix
-{
-  sources ? import ./npins,
-  system ? builtins.currentSystem,
-}:
-let
-  pkgs = import sources.nixpkgs {
-    config = {};
-    overlays = [];
-    inherit system;
-  };
-  home-damager = import sources.home-damager { inherit sources system; };
-  home-manager = pkgs.callPackage home-damager.package {};
-in
-rec {
-  myMachine = home-manager.environment myConfiguration;
-  myConfiguration = { pkgs, ... }: {
-    home.packages = with pkgs; [ cowsay lolcat ];
+Run an interactive NixOS VM test:
 
-    home.username = "myUser";
-    # don't do this in practice. impurities bad.
-    home.homeDirectory = ~/.;
-    home.stateVersion = "23.11";
-  };
-}
+```console
+nix-build --run test-interactive
 ```
+
+When the Python prompt `>>>` appears, enter:
+
+```python
+start_all()
+```
+
+When the login prompt appears, login with `root`.
+Then run:
+
+```console
+run-test
+```
+
+When the test succeeds, run `poweroff` and then `Ctrl`+`D` to stop the VM.
+
+Due to the impure `fetchTarball` reference used to automatically fetch the right version of Home Manager (the secret sauce to convenience), it's unfortunately impractical to make a hermetic integration test.

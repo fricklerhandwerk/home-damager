@@ -12,9 +12,23 @@ let
   shell = pkgs.mkShell {
     packages = with pkgs; [
       npins
+      test-interactive
     ];
+  };
+
+  lib = import ./lib.nix;
+
+  test = import ./test.nix;
+
+  test-interactive = pkgs.writeShellApplication {
+    name = "test-interactive";
+    text = "${(pkgs.callPackage test {}).driverInteractive}/bin/nixos-test-driver";
   };
 in
 {
-  inherit shell;
+  inherit
+    shell
+    lib
+    test
+  ;
 }
