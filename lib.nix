@@ -16,7 +16,13 @@ rec {
     };
 
   environment = configuration:
+    let
+      switch = pkgs.writeShellApplication {
+        name = "switch";
+        text = "${(evaluate configuration).activationPackage}/activate";
+      };
+    in
     pkgs.mkShell {
-      shellHook = "exec ${(evaluate configuration).activationPackage}/activate";
+      packages = [ switch ];
     };
 }

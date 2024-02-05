@@ -4,11 +4,11 @@ let
     name = "run-test";
     runtimeInputs = with pkgs; [ nix ];
     text = ''
-      nix-shell ${example} -A myMachine
+      nix-shell ${example} -A myMachine --run switch
       cowsay it works | lolcat
     '';
   };
-  example = pkgs.runCommand "example" {} ''
+  example = pkgs.runCommand "example" { } ''
     mkdir -p $out/npins
     cp ${./example.nix} $out/default.nix
     cp -r ${sources-mock} $out/npins/default.nix
@@ -23,11 +23,11 @@ in
 pkgs.nixosTest {
   name = "home-damager-test";
   nodes.machine = { config, pkgs, ... }:
-  {
-    environment.systemPackages = [ run-test ];
-    virtualisation.memorySize = 2048;
-    virtualisation.mountHostNixStore = true;
-  };
+    {
+      environment.systemPackages = [ run-test ];
+      virtualisation.memorySize = 2048;
+      virtualisation.mountHostNixStore = true;
+    };
   testScript = { nodes, ... }: ''
     # this won't actually work because of the impure `fetchTarball`
     machine.succeed("${run-test}/bin/run-test")

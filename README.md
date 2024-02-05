@@ -19,7 +19,7 @@ In my opinion, installing Home Manager should work like this:
 
 4. Add attributes to `default.nix` that correspond to the machines or profiles or users you're managing.
 
-5. Run `nix-shell -A <attribute>` to instantly switch to an environment.
+5. Run `nix-shell -A <attribute> --run switch` to instantly switch to an environment.
 
 6. In an existing environment, run `home-manager switch` as usual.
 
@@ -46,7 +46,7 @@ npins add github fricklerhandwerk home-damager
 Run an interactive NixOS VM test:
 
 ```console
-nix-build --run test-interactive
+nix-shell --run test-interactive
 ```
 
 When the Python prompt `>>>` appears, enter:
