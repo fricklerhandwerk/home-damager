@@ -35,7 +35,7 @@ To use it, get a copy and add remote sources:
 
 ```console
 nix-shell -p npins wget --run $SHELL
-wget https://github.com/fricklerhanderk/home-damager/tree/main/example.nix
+wget https://github.com/fricklerhandwerk/home-damager/blob/main/example.nix
 npins init --bare
 npins add github nixos nixpkgs --branch nixos-23.11
 npins add github fricklerhandwerk home-damager
