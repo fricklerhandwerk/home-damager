@@ -28,7 +28,6 @@ It will match the Home Manager release to the version of Nixpkgs in use for the 
 
 # Example
 
-
 Check [`example.nix`](./example.nix) for the structure of the entry point to your set of Home Manager configurations.
 
 To use it, get a copy and add remote sources:
@@ -65,3 +64,5 @@ run-test
 When the test succeeds, run `poweroff` and then `Ctrl`+`D` to stop the VM.
 
 Due to the impure `fetchTarball` reference used to automatically fetch the right version of Home Manager (the secret sauce to convenience), it's unfortunately impractical to make a hermetic integration test.
+This is in fact a strong indication that we're holding it wrong.
+Stand-alone Home Manager should be a *distribution* of Nixpkgs, and therefore ship with its own Nixpkgs as well as conveniences to update itself and its dependencies appropriately.
