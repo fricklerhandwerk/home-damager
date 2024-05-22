@@ -1,14 +1,16 @@
 {
   sources ? import ./npins,
   system ? builtins.currentSystem,
+  pkgs ? import sources.nixpkgs { inherit system; config = { }; overlays = [ ]; },
 }:
 let
-  pkgs = import sources.nixpkgs {
-    inherit system;
-    config = { };
-    overlays = [ ];
+  test = import ./test.nix;
+  test-interactive = pkgs.writeShellApplication {
+    name = "test-interactive";
+    text = "${(pkgs.callPackage test {}).driverInteractive}/bin/nixos-test-driver";
   };
-
+in
+rec {
   shell = pkgs.mkShell {
     packages = with pkgs; [
       npins
@@ -18,17 +20,5 @@ let
 
   lib = import ./lib.nix;
 
-  test = import ./test.nix;
-
-  test-interactive = pkgs.writeShellApplication {
-    name = "test-interactive";
-    text = "${(pkgs.callPackage test {}).driverInteractive}/bin/nixos-test-driver";
-  };
-in
-{
-  inherit
-    shell
-    lib
-    test
-  ;
+  inherit test;
 }
