@@ -18,7 +18,7 @@ rec {
     ];
   };
 
-  lib = import ./lib.nix;
+  lib = pkgs.callPackage ./lib.nix { };
 
   inherit test;
 }
