@@ -1,28 +1,26 @@
-{ pkgs }:
+let
+  sources = import ./npins;
+  flake-inputs = import sources.flake-inputs;
+in
+{
+  home-manager,
+  pkgs ? import (flake-inputs { root = home-manager; }).nixpkgs { inherit system config overlays; },
+  system ? builtins.currentSystem,
+  config ? { },
+  overlays ? [ ],
+}:
 rec {
-  version = with pkgs; lib.versions.majorMinor lib.version;
+  inherit pkgs;
 
-  # XXX: this must be an impure reference.
-  # if `pkgs.fetchFromGitHub` was used here, specifying a commit hash would be required.
-  # this makes it essentially un-testable automatically in a NixOS VM...
-  home-manager = fetchTarball {
-    name = "home-manager-${version}";
-    url = "https://github.com/nix-community/home-manager/tarball/release-${version}";
-  };
+  evaluate = configuration: import "${home-manager}/modules" { inherit pkgs configuration; };
 
-  evaluate = configuration:
-    import "${home-manager}/modules" {
-      inherit pkgs configuration;
-    };
-
-  environment = configuration:
+  environment =
+    configuration:
     let
       switch = pkgs.writeShellApplication {
         name = "switch";
-        text = "${(evaluate configuration).activationPackage}/activate";
+        text = ''exec ${(evaluate configuration).activationPackage}/activate "$@"'';
       };
     in
-    pkgs.mkShell {
-      packages = [ switch ];
-    };
+    pkgs.mkShellNoCC { packages = [ switch ]; };
 }

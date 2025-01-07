@@ -1,24 +1,52 @@
 {
   sources ? import ./npins,
   system ? builtins.currentSystem,
-  pkgs ? import sources.nixpkgs { inherit system; config = { }; overlays = [ ]; },
 }:
 let
-  test = import ./test.nix;
+  inherit (lib.home-damager) pkgs;
+
+  lib.home-damager = import ./lib.nix {
+    inherit system;
+    inherit (sources) home-manager;
+  };
+
+  inherit ((import sources.lazy-drv { inherit pkgs system; }).lib) lazy-drv;
+
+  test = pkgs.callPackage ./test.nix { inherit sources; };
+
+  lazy = lazy-drv.lazy-run {
+    nix-build-args = [
+      "--builders"
+      ''""''
+    ];
+    source = "${
+      with pkgs.lib.fileset;
+      toSource {
+        root = ./.;
+        fileset = unions [
+          ./default.nix
+          ./lib.nix
+          ./test.nix
+          ./example.nix
+          ./npins
+        ];
+      }
+    }";
+    attrs = {
+      inherit test-interactive;
+    };
+  };
+
   test-interactive = pkgs.writeShellApplication {
     name = "test-interactive";
-    text = "${(pkgs.callPackage test {}).driverInteractive}/bin/nixos-test-driver";
+    text = ''exec ${pkgs.lib.getExe test.driverInteractive} "$@"'';
   };
+
 in
 rec {
-  shell = pkgs.mkShell {
-    packages = with pkgs; [
-      npins
-      test-interactive
-    ];
+  shell = pkgs.mkShellNoCC {
+    packages = (with pkgs; [ npins ]) ++ (with pkgs.lib; collect isDerivation lazy);
   };
 
-  lib = pkgs.callPackage ./lib.nix { };
-
-  inherit test;
+  inherit lib test test-interactive;
 }

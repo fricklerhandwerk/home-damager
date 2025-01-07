@@ -1,16 +1,40 @@
 {
   "pins": {
-    "nixpkgs": {
+    "flake-inputs": {
       "type": "Git",
       "repository": {
         "type": "GitHub",
-        "owner": "nixos",
-        "repo": "nixpkgs"
+        "owner": "fricklerhandwerk",
+        "repo": "flake-inputs"
       },
-      "branch": "nixos-23.11",
-      "revision": "f4a8d6d5324c327dcc2d863eb7f3cc06ad630df4",
-      "url": "https://github.com/nixos/nixpkgs/archive/f4a8d6d5324c327dcc2d863eb7f3cc06ad630df4.tar.gz",
-      "hash": "0nlm934nnx09lfilz8171rx6x510g9ffdyrzijvqr5gh1vjdhmvq"
+      "branch": "main",
+      "revision": "559574c9cbb8af262f3944b67d60fbf0f6ad03c3",
+      "url": "https://github.com/fricklerhandwerk/flake-inputs/archive/559574c9cbb8af262f3944b67d60fbf0f6ad03c3.tar.gz",
+      "hash": "0gbhmp6x2vdzvfnsvqzal3g8f8hx2ia6r73aibc78kazf78m67x6"
+    },
+    "home-manager": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "nix-community",
+        "repo": "home-manager"
+      },
+      "branch": "release-24.11",
+      "revision": "c7ffc9727d115e433fd884a62dc164b587ff651d",
+      "url": "https://github.com/nix-community/home-manager/archive/c7ffc9727d115e433fd884a62dc164b587ff651d.tar.gz",
+      "hash": "0wmh55ksjlp76qnkpajyb7hr73wk6chcxm5riqr75ibaj2dvlcyf"
+    },
+    "lazy-drv": {
+      "type": "Git",
+      "repository": {
+        "type": "GitHub",
+        "owner": "fricklerhandwerk",
+        "repo": "lazy-drv"
+      },
+      "branch": "main",
+      "revision": "21e9ee0b1919ee763d34ca874c2022945d528ddd",
+      "url": "https://github.com/fricklerhandwerk/lazy-drv/archive/21e9ee0b1919ee763d34ca874c2022945d528ddd.tar.gz",
+      "hash": "1cg4lav5i0n3m8zb17n9svzig6v20kgg7ix0agv05qs2v8sfjh8w"
     }
   },
   "version": 3

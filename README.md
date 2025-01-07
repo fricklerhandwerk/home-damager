@@ -9,7 +9,7 @@ And [Home Manager dropping a `flake.nix`](https://github.com/nix-community/home-
 
 While Home Manager environments are declarative, installation is not!
 
-In my opinion, installing Home Manager should work like this:
+In my opinion, using Home Manager should work like this:
 
 1. Add a `default.nix` in a directory of choice.
 
@@ -24,7 +24,19 @@ In my opinion, installing Home Manager should work like this:
 6. In an existing environment, run `home-manager switch` as usual.
 
 This repository implements such a wrapper around Home Manager, which you can use as just described.
-It will match the Home Manager release to the version of Nixpkgs in use for the given expression.
+
+# Background
+
+The underlying problem is that we've been doing it backwards this entire time.
+Nix is still being misunderstood as a user-facing application, while really it's a low-level library that *actual* applications can build upon to do useful things.
+
+Home Manager is such an application, which strongly depends on Nixpkgs, which in turn strongly depends on the Nix language and the Nix store.
+Note how the Nix CLI doesn't even get an honorable mention here.
+
+This is why with `home-damager` you import and keep updated a Home Manager release and use the version of Nixpkgs shipped with Home Manager, not the other way around.
+Passing your own arbitrary Nixpkgs is merely an escape hatch, such as for emergency updates, and should be a very deliberate exception.
+
+Driven to conclusion, Home Manager should have its own first-class installer and bring its own Nix under the hood.
 
 # Example
 
@@ -33,36 +45,35 @@ Check [`example.nix`](./example.nix) for the structure of the entry point to you
 To use it, get a copy and add remote sources:
 
 ```console
-nix-shell -p npins wget --run $SHELL
-wget https://github.com/fricklerhandwerk/home-damager/blob/main/example.nix
+nix-shell -p npins curl
+pushd $(mktemp -d)
+curl https://github.com/fricklerhandwerk/home-damager/blob/main/example.nix > default.nix
 npins init --bare
-npins add github nixos nixpkgs --branch nixos-23.11
+npins add github nix-community home-manager --branch release-24.11
 npins add github fricklerhandwerk home-damager --branch main
+nix-shell --run switch
 ```
+
+To uninstall, delete all profile generations created by Home Manager.
+On a vanilla system this amounts to:
+
+
+```bash
+rm "${XDG_STATE_HOME:-$HOME/.local/state}"/nix/profiles/{home-manager,profile}*
+```
+
+The next garbage collection will remove the dangling store objects.
 
 # Development
 
-Run an interactive NixOS VM test:
+Run a NixOS VM test:
+
+```console
+nix-build -A test
+```
+
+Run the test interactively:
 
 ```console
 nix-shell --run test-interactive
 ```
-
-When the Python prompt `>>>` appears, enter:
-
-```python
-start_all()
-```
-
-When the login prompt appears, login with `root`.
-Then run:
-
-```console
-run-test
-```
-
-When the test succeeds, run `poweroff` and then `Ctrl`+`D` to stop the VM.
-
-Due to the impure `fetchTarball` reference used to automatically fetch the right version of Home Manager (the secret sauce to convenience), it's unfortunately impractical to make a hermetic integration test.
-This is in fact a strong indication that we're holding it wrong.
-Stand-alone Home Manager should be a *distribution* of Nixpkgs, and therefore ship with its own Nixpkgs as well as conveniences to update itself and its dependencies appropriately.
