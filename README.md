@@ -47,7 +47,7 @@ To use it, get a copy and add remote sources:
 ```console
 nix-shell -p npins curl
 pushd $(mktemp -d)
-curl https://github.com/fricklerhandwerk/home-damager/blob/main/example.nix > default.nix
+curl -L https://github.com/fricklerhandwerk/home-damager/raw/main/example.nix -o default.nix
 npins init --bare
 npins add github nix-community home-manager --branch release-24.11
 npins add github fricklerhandwerk home-damager --branch main
